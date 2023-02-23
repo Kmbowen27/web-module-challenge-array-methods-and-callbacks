@@ -107,7 +107,18 @@ Use the higher order function `getAverageGoals` to do the following:
  
 */
 
-function getAverageGoals(callback) {}
+function getAverageGoals(callback) {
+	let meanGoals =
+		callback.reduce(
+			(total, current) =>
+				total + current["Home Team Goals"] + current["Away Team Goals"],
+			0
+		) / callback.length;
+	meanGoals = meanGoals.toFixed(2);
+	return meanGoals;
+}
+
+console.log("Task 6:", getAverageGoals(getFinals(fifaData)));
 
 /// 🥅 STRETCH 🥅 ///
 
@@ -117,16 +128,43 @@ Create a function called `getCountryWins` that takes the parameters `data` and `
 Hint: Investigate your data to find "team initials"!
 Hint: use `.reduce` */
 
-function getCountryWins(/* code here */) {
-	/* code here */
+function getCountryWins(data, teamInitials) {
+	const winnersInit = data.map((value) =>
+		value["Home Team Goals"] > value["Away Team Goals"]
+			? value["Home Team Initials"]
+			: value["Away Team Initials"]
+	);
+	const teamWins = winnersInit.reduce(
+		(total, current) => (current === teamInitials ? total + 1 : total + 0),
+		0
+	);
+	return teamWins;
 }
+
+console.log(
+	"Stretch 1(ITA - Italy):",
+	getCountryWins(getFinals(fifaData), "ITA")
+);
+console.log(
+	"Stretch 1(URU - Uruguay):",
+	getCountryWins(getFinals(fifaData), "URU")
+);
+console.log(
+	"Stretch 1(FRA - France):",
+	getCountryWins(getFinals(fifaData), "FRA")
+);
 
 /* 💪💪💪💪💪 Stretch 2: 💪💪💪💪💪 
 Write a function called getGoals() that accepts a parameter `data` and returns the team with the most goals score per appearance (average goals for) in the World Cup finals */
 
-function getGoals(/* code here */) {
-	/* code here */
+function getGoals(data) {
+	const teamGoals = data.map((value) => {
+		value["Home Team Name"], value["Home Team Goals"];
+	});
+	return teamGoals;
 }
+
+console.log("Stretch 2:", getGoals(getFinals(fifaData)));
 
 /* 💪💪💪💪💪 Stretch 3: 💪💪💪💪💪
 Write a function called badDefense() that accepts a parameter `data` and calculates the team with the most goals scored against them per appearance (average goals against) in the World Cup finals */
