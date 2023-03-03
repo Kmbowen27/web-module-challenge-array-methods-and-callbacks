@@ -108,14 +108,14 @@ Use the higher order function `getAverageGoals` to do the following:
 */
 
 function getAverageGoals(callback) {
-	let meanGoals =
+	let avgGoals =
 		callback.reduce(
 			(total, current) =>
 				total + current["Home Team Goals"] + current["Away Team Goals"],
 			0
 		) / callback.length;
-	meanGoals = meanGoals.toFixed(2);
-	return meanGoals;
+	avgGoals = avgGoals.toFixed(2);
+	return avgGoals;
 }
 
 console.log("Task 6:", getAverageGoals(getFinals(fifaData)));
@@ -141,27 +141,47 @@ function getCountryWins(data, teamInitials) {
 	return teamWins;
 }
 
-console.log(
-	"Stretch 1(ITA - Italy):",
-	getCountryWins(getFinals(fifaData), "ITA")
-);
-console.log(
-	"Stretch 1(URU - Uruguay):",
-	getCountryWins(getFinals(fifaData), "URU")
-);
-console.log(
-	"Stretch 1(FRA - France):",
-	getCountryWins(getFinals(fifaData), "FRA")
-);
+console.log("Stretch 1(ITA):", getCountryWins(getFinals(fifaData), "ITA"));
+console.log("Stretch 1(URU):", getCountryWins(getFinals(fifaData), "URU"));
+console.log("Stretch 1(FRA):", getCountryWins(getFinals(fifaData), "FRA"));
 
 /* 💪💪💪💪💪 Stretch 2: 💪💪💪💪💪 
 Write a function called getGoals() that accepts a parameter `data` and returns the team with the most goals score per appearance (average goals for) in the World Cup finals */
 
 function getGoals(data) {
-	const teamGoals = data.map((value) => {
-		value["Home Team Name"], value["Home Team Goals"];
-	});
-	return teamGoals;
+	const goalsByTeam = data.reduce((acc, game) => {
+		const homeTeam = game["Home Team Name"];
+		const homeTeamGoals = game["Home Team Goals"];
+		const awayTeam = game["Away Team Name"];
+		const awayTeamGoals = game["Away Team Goals"];
+
+		acc[homeTeam] = acc[homeTeam] || { goals: 0, appearances: 0 };
+		acc[homeTeam].goals += homeTeamGoals;
+		acc[homeTeam].appearances += 1;
+		acc[awayTeam] = acc[awayTeam] || { goals: 0, appearances: 0 };
+		acc[awayTeam].goals += awayTeamGoals;
+		acc[awayTeam].appearances += 1;
+
+		return acc;
+	}, {});
+
+	const bestTeam = Object.keys(goalsByTeam).reduce(
+		(best, team) => {
+			const goals = goalsByTeam[team].goals;
+			const appearances = goalsByTeam[team].appearances;
+			const avgGoalsFor = goals / appearances;
+
+			if (avgGoalsFor > best.avgGoalsFor) {
+				best.team = team;
+				best.avgGoalsFor = avgGoalsFor;
+			}
+
+			return best;
+		},
+		{ team: "", avgGoalsFor: 0 }
+	);
+
+	return bestTeam;
 }
 
 console.log("Stretch 2:", getGoals(getFinals(fifaData)));
@@ -169,9 +189,43 @@ console.log("Stretch 2:", getGoals(getFinals(fifaData)));
 /* 💪💪💪💪💪 Stretch 3: 💪💪💪💪💪
 Write a function called badDefense() that accepts a parameter `data` and calculates the team with the most goals scored against them per appearance (average goals against) in the World Cup finals */
 
-function badDefense(/* code here */) {
-	/* code here */
+function badDefense(data) {
+	const goalsByTeam = data.reduce((acc, game) => {
+		const homeTeam = game["Home Team Name"];
+		const homeTeamGoalsAgainst = game["Away Team Goals"];
+		const awayTeam = game["Away Team Name"];
+		const awayTeamGoalsAgainst = game["Home Team Goals"];
+
+		acc[homeTeam] = acc[homeTeam] || { goalsAgainst: 0, appearances: 0 };
+		acc[homeTeam].goalsAgainst += homeTeamGoalsAgainst;
+		acc[homeTeam].appearances += 1;
+		acc[awayTeam] = acc[awayTeam] || { goalsAgainst: 0, appearances: 0 };
+		acc[awayTeam].goalsAgainst += awayTeamGoalsAgainst;
+		acc[awayTeam].appearances += 1;
+
+		return acc;
+	}, {});
+
+	const worstTeam = Object.keys(goalsByTeam).reduce(
+		(worst, team) => {
+			const goalsAgainst = goalsByTeam[team].goalsAgainst;
+			const appearances = goalsByTeam[team].appearances;
+			const avgGoalsAgainst = goalsAgainst / appearances;
+
+			if (avgGoalsAgainst > worst.avgGoalsAgainst) {
+				worst.team = team;
+				worst.avgGoalsAgainst = avgGoalsAgainst;
+			}
+
+			return worst;
+		},
+		{ team: "", avgGoalsAgainst: 0 }
+	);
+
+	return worstTeam;
 }
+
+console.log("Stretch 3:", badDefense(getFinals(fifaData)));
 
 /* If you still have time, use the space below to work on any stretch goals of your chosing as listed in the README file. */
 
